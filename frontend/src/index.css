@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --mag-gradient: linear-gradient(135deg, #141754 0%, #2337e8 50%, #14b8a6 100%);
+    --card-bg: rgba(255,255,255,0.05);
+    --border-color: rgba(255,255,255,0.1);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    @apply bg-mag-950 text-white font-sans;
+    background: #0e1130;
+  }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+  ::-webkit-scrollbar-thumb { background: rgba(58,85,245,0.4); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(58,85,245,0.7); }
+}
+
+@layer components {
+  .glass {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+  }
+
+  .glass-card {
+    @apply glass rounded-2xl p-5;
+  }
+
+  .btn-primary {
+    @apply bg-mag-500 hover:bg-mag-600 text-white font-semibold px-5 py-2.5 rounded-xl
+           transition-all duration-200 flex items-center gap-2 cursor-pointer;
+  }
+
+  .btn-secondary {
+    @apply glass hover:bg-white/10 text-white font-medium px-4 py-2 rounded-xl
+           transition-all duration-200 flex items-center gap-2 cursor-pointer;
+  }
+
+  .btn-danger {
+    @apply bg-red-500/20 hover:bg-red-500/40 text-red-300 border border-red-500/30
+           font-medium px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 cursor-pointer;
+  }
+
+  .input {
+    @apply bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2.5 w-full
+           focus:outline-none focus:border-mag-400 focus:ring-1 focus:ring-mag-400/30
+           placeholder-white/30 transition-all;
+  }
+
+  .label {
+    @apply text-white/60 text-sm font-medium mb-1.5 block;
+  }
+
+  .badge {
+    @apply text-xs font-semibold px-2.5 py-1 rounded-full;
+  }
+
+  .badge-virus       { @apply bg-yellow-500/20 text-yellow-300 border border-yellow-500/30; }
+  .badge-bacterias   { @apply bg-blue-500/20 text-blue-300 border border-blue-500/30; }
+  .badge-hongos      { @apply bg-green-500/20 text-green-300 border border-green-500/30; }
+  .badge-parasitos   { @apply bg-orange-500/20 text-orange-300 border border-orange-500/30; }
+  .badge-disfuncion  { @apply bg-purple-500/20 text-purple-300 border border-purple-500/30; }
+  .badge-psicoemocional { @apply bg-pink-500/20 text-pink-300 border border-pink-500/30; }
+  .badge-reservorios { @apply bg-red-500/20 text-red-300 border border-red-500/30; }
+  .badge-complejos   { @apply bg-gray-500/20 text-gray-300 border border-gray-500/30; }
+
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/60 hover:text-white
+           hover:bg-white/5 transition-all duration-200 cursor-pointer text-sm font-medium;
+  }
+  .nav-item.active {
+    @apply bg-mag-500/20 text-mag-300 border border-mag-500/20;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.3s ease forwards; }
+
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+.pulse-ring::after {
+  content: '';
+  @apply absolute inset-0 rounded-full bg-mag-500/30;
+  animation: pulse-ring 1.5s ease-out infinite;
+}
