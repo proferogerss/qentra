@@ -169,7 +169,7 @@ function Escena({ pares, paresActivos, onParClick }) {
         <Modelo />
       </Suspense>
 
-      {pares.map(par => {
+      {pares.map((par, idx) => {
         if (par.coord_x_der == null) return null;
         const activo = paresActivos.includes(par.id);
         const cat = CATEGORIA_COLOR[par.categoria] || { color: '#94a3b8', label: '?' };
@@ -178,11 +178,19 @@ function Escena({ pares, paresActivos, onParClick }) {
         const y = toY(par.zona_cuerpo);
         const xD = toX(par.coord_x_der);
         const xI = toX(par.coord_x_izq);
-        // Pequeña variación en Z basada en el ID para evitar amontonamiento
-        const zOffset = ((par.id * 7) % 5) * 0.008;
-        const posD = [xD, y, 0.10 + zOffset];
-        const posI = [xI, y, 0.10 + zOffset];
-        const isDiff = Math.abs(xD - xI) > 0.05;
+
+        // Distribuir puntos en capas alrededor del cuerpo (frente, lados, espalda)
+        // Usamos el índice para asignar un ángulo en el círculo (0=frente, π=espalda)
+        // Radio del cuerpo aproximado: 0.12 unidades
+        const totalPares = pares.length;
+        const angulo = (idx / totalPares) * Math.PI * 2; // 0 a 2π
+        const radio = 0.13;
+        const zPos = Math.cos(angulo) * radio;
+        const xOffset = Math.sin(angulo) * 0.04; // pequeña variación X por ángulo
+
+        const posD = [xD + xOffset, y, zPos];
+        const posI = [xI - xOffset, y, zPos];
+        const isDiff = Math.abs(xD - xI) > 0.04;
 
         return (
           <group key={par.id}>
