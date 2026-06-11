@@ -20,13 +20,13 @@ const CATEGORIA_COLOR = {
 // Posiciones 3D de zonas corporales (en espacio normalizado post-rotación)
 // Y positivo = arriba (cabeza), Y negativo = abajo (pies)
 const ZONA_Y = {
-  cabeza:       1.85,
-  cuello:       1.50,
-  torax:        1.00,
-  abdomen:      0.40,
-  pelvis:      -0.10,
-  espalda:      0.80,
-  extremidades:-0.80,
+  cabeza:       1.00,
+  cuello:       0.82,
+  torax:        0.55,
+  abdomen:      0.20,
+  pelvis:      -0.08,
+  espalda:      0.45,
+  extremidades:-0.50,
 };
 
 // Convierte coord_x (0-100, 50=centro) a X en 3D
@@ -34,7 +34,7 @@ const ZONA_Y = {
 function toX(coord, lado) {
   if (coord == null) return lado === 'D' ? -0.30 : 0.30;
   // 50 = centro, <50 = izquierda pantalla = derecha paciente = X negativo
-  return ((coord - 50) / 50) * 0.55;
+  return ((coord - 50) / 50) * 0.30;
 }
 
 function toY(zona) {
@@ -151,8 +151,8 @@ function Modelo() {
     const center = box.getCenter(new THREE.Vector3());
 
     // El eje más largo es Z (altura del cuerpo acostado = ~68)
-    // Escalamos para que mida 4.0 unidades de alto
-    const targetHeight = 4.0;
+    // Escalamos para que mida 2.2 unidades de alto
+    const targetHeight = 2.2;
     const scale = targetHeight / size.z;
     scene.scale.setScalar(scale);
 
@@ -197,8 +197,8 @@ function Escena({ pares, paresActivos, onParClick }) {
         const y = toY(par.zona_cuerpo);
         const xD = toX(par.coord_x_der, 'D');
         const xI = toX(par.coord_x_izq, 'I');
-        const posD = [xD, y, 0.18];
-        const posI = [xI, y, 0.18];
+        const posD = [xD, y, 0.12];
+        const posI = [xI, y, 0.12];
         const isDiff = Math.abs(xD - xI) > 0.05;
 
         return (
@@ -228,9 +228,9 @@ function Escena({ pares, paresActivos, onParClick }) {
 
       <OrbitControls
         enablePan={false}
-        minDistance={2}
-        maxDistance={8}
-        target={[0, 0.2, 0]}
+        minDistance={1.5}
+        maxDistance={6}
+        target={[0, 0, 0]}
         minPolarAngle={0}
         maxPolarAngle={Math.PI}
       />
@@ -247,7 +247,7 @@ export default function CuerpoSVG({ pares = [], paresActivos = [], onParClick })
       </div>
 
       <div className="rounded-xl overflow-hidden border border-white/5 bg-[#080b24]" style={{ height: 480 }}>
-        <Canvas camera={{ position: [0, 0.5, 4.5], fov: 42 }} gl={{ antialias: true }}>
+        <Canvas camera={{ position: [0, 0.2, 3.8], fov: 38 }} gl={{ antialias: true }}>
           <Escena pares={pares} paresActivos={paresActivos} onParClick={onParClick} />
         </Canvas>
       </div>
