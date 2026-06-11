@@ -150,6 +150,9 @@ function Modelo() {
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
 
+    console.log('[QENTRA-DEBUG] Tamaño original del modelo:', size);
+    console.log('[QENTRA-DEBUG] Centro original:', center);
+
     // El eje más largo es Z (altura del cuerpo acostado = ~68)
     // Escalamos para que mida 2.2 unidades de alto
     const targetHeight = 2.2;
@@ -160,6 +163,12 @@ function Modelo() {
     const box2 = new THREE.Box3().setFromObject(scene);
     const center2 = box2.getCenter(new THREE.Vector3());
     scene.position.set(-center2.x, -center2.y, -center2.z);
+
+    const box3 = new THREE.Box3().setFromObject(scene);
+    const size3 = box3.getSize(new THREE.Vector3());
+    const center3 = box3.getCenter(new THREE.Vector3());
+    console.log('[QENTRA-DEBUG] Tamaño FINAL (post-scale):', size3);
+    console.log('[QENTRA-DEBUG] Centro FINAL:', center3);
 
     // Rotar: el modelo está acostado (Z=altura), lo paramos (-90° en X)
     if (groupRef.current) {
