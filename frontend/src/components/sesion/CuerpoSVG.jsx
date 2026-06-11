@@ -19,26 +19,24 @@ const CATEGORIA_COLOR = {
 // Centro real: X≈13, Y≈6, Z≈34  → tras escalar a altura 4.0: factor = 4/68 ≈ 0.0588
 // Posiciones 3D de zonas corporales (en espacio normalizado post-rotación)
 // Y positivo = arriba (cabeza), Y negativo = abajo (pies)
+// Modelo final mide 2.0 unidades en Y
 const ZONA_Y = {
-  cabeza:       1.00,
-  cuello:       0.82,
-  torax:        0.55,
-  abdomen:      0.20,
-  pelvis:      -0.08,
-  espalda:      0.45,
-  extremidades:-0.50,
+  cabeza:       0.88,
+  cuello:       0.72,
+  torax:        0.48,
+  abdomen:      0.18,
+  pelvis:      -0.07,
+  espalda:      0.40,
+  extremidades:-0.55,
 };
 
-// Convierte coord_x (0-100, 50=centro) a X en 3D
-// Derecho del paciente = X negativo en Three.js (espejo)
-function toX(coord, lado) {
-  if (coord == null) return lado === 'D' ? -0.30 : 0.30;
-  // 50 = centro, <50 = izquierda pantalla = derecha paciente = X negativo
-  return ((coord - 50) / 50) * 0.30;
+function toX(coord) {
+  if (coord == null) return 0;
+  return ((coord - 50) / 50) * 0.25;
 }
 
 function toY(zona) {
-  return ZONA_Y[zona] ?? 0.3;
+  return ZONA_Y[zona] ?? 0.2;
 }
 
 // Punto 3D
@@ -131,7 +129,6 @@ function Modelo() {
   const groupRef = useRef();
 
   useEffect(() => {
-    // Aplicar material anatómico
     scene.traverse(child => {
       if (child.isMesh) {
         child.material = new THREE.MeshStandardMaterial({
@@ -145,42 +142,25 @@ function Modelo() {
       }
     });
 
-    // Calcular bounding box real
     const box = new THREE.Box3().setFromObject(scene);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
 
-    console.log('[QENTRA-DEBUG] Tamaño original del modelo:', size);
-    console.log('[QENTRA-DEBUG] Centro original:', center);
-
-    // El eje más largo es Z (altura del cuerpo acostado = ~68)
-    // Escalamos para que mida 2.2 unidades de alto
-    const targetHeight = 2.2;
-    const scale = targetHeight / size.z;
+    // Eje largo real es Y (0.0269), escalar a 2.0 unidades
+    const targetHeight = 2.0;
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = targetHeight / maxDim;
     scene.scale.setScalar(scale);
 
-    // Recentrar después de escalar
+    // Recentrar
     const box2 = new THREE.Box3().setFromObject(scene);
     const center2 = box2.getCenter(new THREE.Vector3());
     scene.position.set(-center2.x, -center2.y, -center2.z);
 
-    const box3 = new THREE.Box3().setFromObject(scene);
-    const size3 = box3.getSize(new THREE.Vector3());
-    const center3 = box3.getCenter(new THREE.Vector3());
-    console.log('[QENTRA-DEBUG] Tamaño FINAL (post-scale):', size3);
-    console.log('[QENTRA-DEBUG] Centro FINAL:', center3);
-
-    // Rotar: el modelo está acostado (Z=altura), lo paramos (-90° en X)
-    if (groupRef.current) {
-      groupRef.current.rotation.x = -Math.PI / 2;
-    }
   }, [scene]);
 
-  return (
-    <group ref={groupRef}>
-      <primitive object={scene} />
-    </group>
-  );
+  // No rotación — el modelo ya está parado en Y
+  return <primitive object={scene} />;
 }
 
 function Escena({ pares, paresActivos, onParClick }) {
@@ -204,8 +184,8 @@ function Escena({ pares, paresActivos, onParClick }) {
         const colorInt = parseInt(cat.color.replace('#', ''), 16);
 
         const y = toY(par.zona_cuerpo);
-        const xD = toX(par.coord_x_der, 'D');
-        const xI = toX(par.coord_x_izq, 'I');
+        const xD = toX(par.coord_x_der);
+        const xI = toX(par.coord_x_izq);
         const posD = [xD, y, 0.12];
         const posI = [xI, y, 0.12];
         const isDiff = Math.abs(xD - xI) > 0.05;
@@ -237,8 +217,8 @@ function Escena({ pares, paresActivos, onParClick }) {
 
       <OrbitControls
         enablePan={false}
-        minDistance={1.5}
-        maxDistance={6}
+        minDistance={1.2}
+        maxDistance={5}
         target={[0, 0, 0]}
         minPolarAngle={0}
         maxPolarAngle={Math.PI}
@@ -256,7 +236,7 @@ export default function CuerpoSVG({ pares = [], paresActivos = [], onParClick })
       </div>
 
       <div className="rounded-xl overflow-hidden border border-white/5 bg-[#080b24]" style={{ height: 480 }}>
-        <Canvas camera={{ position: [0, 0.2, 3.8], fov: 38 }} gl={{ antialias: true }}>
+        <Canvas camera={{ position: [0, 0, 2.8], fov: 42 }} gl={{ antialias: true }}>
           <Escena pares={pares} paresActivos={paresActivos} onParClick={onParClick} />
         </Canvas>
       </div>
