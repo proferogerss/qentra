@@ -55,21 +55,21 @@ function PuntoPar({ position, colorHex, activo, par, onClick, onHover }) {
     }
   });
 
-  const radius = activo ? 0.055 : 0.038;
+  const radius = activo ? 0.022 : 0.014;
 
   return (
     <group position={position}>
       {(activo || hovered) && (
         <mesh>
-          <sphereGeometry args={[radius * 2.5, 10, 10]} />
-          <meshBasicMaterial color={colorHex} transparent opacity={0.18} />
+          <sphereGeometry args={[radius * 2.2, 8, 8]} />
+          <meshBasicMaterial color={colorHex} transparent opacity={0.15} />
         </mesh>
       )}
       <mesh ref={meshRef}
         onClick={e => { e.stopPropagation(); onClick(par); }}
         onPointerOver={e => { e.stopPropagation(); setHovered(true); onHover(par); document.body.style.cursor = 'pointer'; }}
         onPointerOut={() => { setHovered(false); onHover(null); document.body.style.cursor = 'auto'; }}>
-        <sphereGeometry args={[radius, 16, 16]} />
+        <sphereGeometry args={[radius, 12, 12]} />
         <meshStandardMaterial
           color={colorHex}
           emissive={colorHex}
@@ -79,28 +79,20 @@ function PuntoPar({ position, colorHex, activo, par, onClick, onHover }) {
         />
       </mesh>
       {hovered && (
-        <Html distanceFactor={5} style={{ pointerEvents: 'none' }}>
+        <Html distanceFactor={8} style={{ pointerEvents: 'none' }}>
           <div style={{
-            background: 'rgba(14,17,48,0.97)',
-            border: `1.5px solid ${CATEGORIA_COLOR[par.categoria]?.color || '#94a3b8'}`,
-            borderRadius: 8,
-            padding: '7px 12px',
+            background: 'rgba(14,17,48,0.95)',
+            border: `1px solid ${CATEGORIA_COLOR[par.categoria]?.color || '#94a3b8'}`,
+            borderRadius: 6,
+            padding: '4px 8px',
             whiteSpace: 'nowrap',
             fontFamily: 'Outfit, sans-serif',
-            boxShadow: `0 4px 20px ${CATEGORIA_COLOR[par.categoria]?.color || '#94a3b8'}40`,
-            minWidth: 140,
           }}>
-            <div style={{ color: 'white', fontWeight: 700, fontSize: 12, marginBottom: 3 }}>
+            <div style={{ color: 'white', fontWeight: 600, fontSize: 10 }}>
               {par.nombre_corto || par.nombre}
             </div>
-            <div style={{ color: CATEGORIA_COLOR[par.categoria]?.color || '#94a3b8', fontSize: 10, marginBottom: par.microorganismo ? 2 : 0 }}>
+            <div style={{ color: CATEGORIA_COLOR[par.categoria]?.color || '#94a3b8', fontSize: 9 }}>
               {CATEGORIA_COLOR[par.categoria]?.label || par.categoria}
-            </div>
-            {par.microorganismo && (
-              <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 9 }}>{par.microorganismo}</div>
-            )}
-            <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: 9, marginTop: 3 }}>
-              Clic para detalles
             </div>
           </div>
         </Html>
@@ -186,8 +178,10 @@ function Escena({ pares, paresActivos, onParClick }) {
         const y = toY(par.zona_cuerpo);
         const xD = toX(par.coord_x_der);
         const xI = toX(par.coord_x_izq);
-        const posD = [xD, y, 0.12];
-        const posI = [xI, y, 0.12];
+        // Pequeña variación en Z basada en el ID para evitar amontonamiento
+        const zOffset = ((par.id * 7) % 5) * 0.008;
+        const posD = [xD, y, 0.10 + zOffset];
+        const posI = [xI, y, 0.10 + zOffset];
         const isDiff = Math.abs(xD - xI) > 0.05;
 
         return (
